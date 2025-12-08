@@ -37,8 +37,8 @@ CREATE TABLE races (
   date DATE,
   time VARCHAR(20),
   circuit_id VARCHAR(50),
-  INDEX idx_season_round (season, round_num),
-  INDEX idx_circuit (circuit_id)
+  FOREIGN KEY (circuit_id)
+        REFERENCES circuits(circuit_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS drivers;
@@ -70,8 +70,12 @@ CREATE TABLE results (
   laps INT,
   status VARCHAR(100),
   PRIMARY KEY (race_id, driver_id),
-  KEY idx_driver (driver_id),
-  KEY idx_constructor (constructor_id)
+  FOREIGN KEY(race_id)
+        REFERENCES races(race_id),
+  FOREIGN KEY(driver_id)
+        REFERENCES drivers(driver_id),
+  FOREIGN KEY(constructor_id)
+        REFERENCES constructors(constructor_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS qualifying;
@@ -84,7 +88,12 @@ CREATE TABLE qualifying (
   q2 TIME,
   q3 TIME,
   PRIMARY KEY (race_id, driver_id),
-  KEY idx_driver (driver_id)
+  FOREIGN KEY (race_id)
+        REFERENCES races(race_id),
+  FOREIGN KEY (driver_id)
+        REFERENCES drivers(driver_id),
+  FOREIGN KEY (constructor_id)
+        REFERENCES constructors(constructor_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS driver_standings;
@@ -96,7 +105,8 @@ CREATE TABLE driver_standings (
   points DECIMAL(8,1),
   wins INT,
   PRIMARY KEY (season, round_num, driver_id),
-  KEY idx_driver (driver_id)
+  FOREIGN KEY (driver_id)
+        REFERENCES drivers(driver_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS constructor_standings;
@@ -107,7 +117,9 @@ CREATE TABLE constructor_standings (
   position INT,
   points DECIMAL(8,1),
   wins INT,
-  PRIMARY KEY (season, round_num, constructor_id)
+  PRIMARY KEY (season, round_num, constructor_id),
+  FOREIGN KEY (constructor_id)
+          REFERENCES constructors(constructor_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
