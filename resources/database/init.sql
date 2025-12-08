@@ -3,13 +3,12 @@
 -- Adjust paths as needed. Uses LOAD DATA LOCAL INFILE for client-side files.
 
 -- Disable foreign key checks and safe mode during bulk load
+SET GLOBAL local_infile = 1;
 SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_SAFE_UPDATES = 0;
-SET GLOBAL local_infile = 1;
 
+CREATE DATABASE IF NOT EXISTS formuladb;
 CREATE USER 'user' IDENTIFIED BY '1234';
-CREATE DATABASE formuladb;
-
 GRANT ALL PRIVILEGES ON formuladb.* to 'user';
 
 USE formuladb;
@@ -18,6 +17,7 @@ USE formuladb;
 -- 1. CREATE TABLES (in dependency order)
 -- =====================================
 
+DROP TABLE IF EXISTS circuits;
 CREATE TABLE circuits (
   circuit_id VARCHAR(50) PRIMARY KEY,
   name VARCHAR(255),
@@ -28,6 +28,7 @@ CREATE TABLE circuits (
   wikipedia_url VARCHAR(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS races;
 CREATE TABLE races (
   race_id VARCHAR(20) PRIMARY KEY,
   season INT,
@@ -38,23 +39,26 @@ CREATE TABLE races (
   circuit_id VARCHAR(50),
   INDEX idx_season_round (season, round_num),
   INDEX idx_circuit (circuit_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS drivers;
 CREATE TABLE drivers (
   driver_id VARCHAR(50) PRIMARY KEY,
   givenName VARCHAR(100),
   familyName VARCHAR(100),
   nationality VARCHAR(50),
   dob DATE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS constructors;
 CREATE TABLE constructors (
   constructor_id VARCHAR(50) PRIMARY KEY,
   name VARCHAR(255),
   nationality VARCHAR(50),
   wikipedia_url VARCHAR(255)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS results;
 CREATE TABLE results (
   race_id VARCHAR(20),
   driver_id VARCHAR(50),
@@ -68,8 +72,9 @@ CREATE TABLE results (
   PRIMARY KEY (race_id, driver_id),
   KEY idx_driver (driver_id),
   KEY idx_constructor (constructor_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS qualifying;
 CREATE TABLE qualifying (
   race_id VARCHAR(20),
   driver_id VARCHAR(50),
@@ -80,8 +85,9 @@ CREATE TABLE qualifying (
   q3 TIME,
   PRIMARY KEY (race_id, driver_id),
   KEY idx_driver (driver_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS driver_standings;
 CREATE TABLE driver_standings (
   season INT,
   round_num INT,
@@ -91,8 +97,9 @@ CREATE TABLE driver_standings (
   wins INT,
   PRIMARY KEY (season, round_num, driver_id),
   KEY idx_driver (driver_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS constructor_standings;
 CREATE TABLE constructor_standings (
   season INT,
   round_num INT,
@@ -101,84 +108,82 @@ CREATE TABLE constructor_standings (
   points DECIMAL(8,1),
   wins INT,
   PRIMARY KEY (season, round_num, constructor_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Skip f1_2025_last_race_results.csv - it's JSON-like, not standard CSV format [file:5]
 
 -- =====================================
 -- 2. LOAD DATA (in correct dependency order)
 -- =====================================
 
 -- Load circuits first
-LOAD DATA LOCAL INFILE './datafiles/circuits.csv'
-INTO TABLE circuits
+LOAD DATA LOCAL INFILE '/data/circuits.csv' INTO TABLE circuits
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(circuit_id, name, lat, `long`, locality, country, wikipedia_url); [file:3]
+(circuit_id, name, lat, `long`, locality, country, wikipedia_url);
 
 -- Load races (references circuits)
-LOAD DATA LOCAL INFILE './datafiles/races.csv'
+LOAD DATA LOCAL INFILE '/data/races.csv'
 INTO TABLE races
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (race_id, @season, round_num, race_name, date, time, circuit_id)
-SET season = @season; [file:2]
+SET season = @season;
 
 -- Load drivers and constructors (independent)
-LOAD DATA LOCAL INFILE './datafiles/drivers.csv'
+LOAD DATA LOCAL INFILE '/data/drivers.csv'
 INTO TABLE drivers
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(driver_id, givenName, familyName, nationality, dob); [file:6]
+(driver_id, givenName, familyName, nationality, dob);
 
-LOAD DATA LOCAL INFILE './datafiles/constructors.csv'
+LOAD DATA LOCAL INFILE '/data/constructors.csv'
 INTO TABLE constructors
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(constructor_id, name, nationality, wikipedia_url); [file:4]
+(constructor_id, name, nationality, wikipedia_url);
 
 -- Load results (references races/drivers/constructors)
-LOAD DATA LOCAL INFILE './datafiles/results.csv'
+LOAD DATA LOCAL INFILE '/data/results.csv'
 INTO TABLE results
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(race_id, driver_id, constructor_id, grid, position, position_order, points, laps, status); [file:1]
+(race_id, driver_id, constructor_id, grid, position, position_order, points, laps, status);
 
 -- Load qualifying
-LOAD DATA LOCAL INFILE './datafiles/qualifying.csv'
+LOAD DATA LOCAL INFILE '/data/qualifying.csv'
 INTO TABLE qualifying
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(race_id, driver_id, constructor_id, position, q1, q2, q3); [file:8]
+(race_id, driver_id, constructor_id, position, q1, q2, q3);
 
 -- Load standings
-LOAD DATA LOCAL INFILE './datafiles/driver_standings.csv'
+LOAD DATA LOCAL INFILE '/data/driver_standings.csv'
 INTO TABLE driver_standings
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(season, round_num, driver_id, position, points, wins); [file:7]
+(season, round_num, driver_id, position, points, wins);
 
-LOAD DATA LOCAL INFILE './datafiles/constructor_standings.csv'
+LOAD DATA LOCAL INFILE '/data/constructor_standings.csv'
 INTO TABLE constructor_standings
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(season, round_num, constructor_id, position, points, wins); [file:9]
+(season, round_num, constructor_id, position, points, wins);
 
 -- =====================================
 -- 3. ADD FOREIGN KEYS (after all data loaded)
@@ -227,7 +232,7 @@ SELECT COUNT(*) as constructors FROM constructors;
 SELECT COUNT(*) as results FROM results;
 SELECT COUNT(*) as qualifying FROM qualifying;
 SELECT COUNT(*) as driver_standings FROM driver_standings;
-SELECT COUNT(*) as constructor_standings FROM constructor_standings; [file:1][file:2][file:3][file:4][file:6][file:7][file:8][file:9]
+SELECT COUNT(*) as constructor_standings FROM constructor_standings;
 
 -- Quick test query
 SELECT r.race_name, d.givenName, d.familyName, res.position, c.name as constructor

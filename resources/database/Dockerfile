@@ -10,4 +10,6 @@ COPY datafiles /data
 # docker build -t formuladb .
 
 # Running with
-# docker run --detach -p 3306:3306 --name mau-formuladb  --env MARIADB_ROOT_PASSWORD=1234  formuladb
+# docker run --detach -p 3306:3306 --name formuladb1  --env MARIADB_ROOT_PASSWORD=1234  formuladb
+
+# docker run --detach -p 3307:3306 --name formuladb1  --env MARIADB_ROOT_PASSWORD=1234  formuladb
