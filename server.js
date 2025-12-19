@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import basicAuth from 'express-basic-auth';
-import { Circuit, Constructor, Driver, Race } from './logic/database/database-repository.js';
+import { Circuit, Constructor, Driver, Race, Result } from './logic/database/database-repository.js';
 import { CustomError } from './logic/exceptions/errorhandling.js';
 
 const PORT = 3000;
@@ -125,7 +125,6 @@ app.delete('/drivers/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => 
 // End of Driver Endpoints
 
 // Race Endpoints
-
 app.get('/races', (req, res, next) => {
     Race.getAllRaces()
         .then(results => res.json(results))
@@ -160,8 +159,46 @@ app.delete('/races/:id', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
 });
 // End of Race Endpoints
 
+// Result Endpoints
+app.get('/results', (req, res, next) => {
+    Result.getAllResults()
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.get('/:raceId/results/:driverId', (req, res, next) => {
+    const raceId = (req.params.raceId);
+    const driverId = (req.params.driverId);
+    Race.getRaceFromId(raceId, driverId)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.post('/results', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
+    Race.create(req.body)
+        .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
+        .catch(err => next(err));
+});
+
+app.put('/:raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
+    const raceId = (req.params.raceId);
+    const driverId = (req.params.driverId);
+    Race.update(raceId, driverId)
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .catch(err => next(err))
+});
+
+app.delete(':raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
+    const raceId = (req.params.raceId);
+    const driverId = (req.params.driverId);
+    Race.remove(raceId, driverId)
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .catch(err => next(err))
+});
+// End of Result Endpoints
+
 // Global Error Handler
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     if (err instanceof CustomError)
         res.status(err.statusCode).send(err.message);
     else {
