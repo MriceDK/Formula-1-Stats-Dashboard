@@ -17,7 +17,6 @@ USE formuladb;
 -- 1. CREATE TABLES (in dependency order)
 -- =====================================
 
--- TODO: Fix all of the data getting injected correctly
 DROP TABLE IF EXISTS circuits;
 CREATE TABLE circuits (
   circuit_id VARCHAR(50) PRIMARY KEY,
