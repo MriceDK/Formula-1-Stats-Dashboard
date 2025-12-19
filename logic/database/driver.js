@@ -2,10 +2,10 @@ import {executeWithoutResult, executeWithResult} from "./data/connection.js";
 import {BodyParsingError, UnexistingResourceError} from "../exceptions/errorhandling.js";
 
 const GETALLDRIVERSQUERY = "SELECT * FROM `drivers`;";
-const SINGLEDRIVERQUERY = "SELECT * from `drivers` WHERE `constructor_id` = ?;";
+const SINGLEDRIVERQUERY = "SELECT * from `drivers` WHERE `driver_id` = ?;";
 const CREATEDRIVERQUERY = "INSERT INTO `drivers` (`driver_id`, `givenName`, `familyName`, `nationality`, `dob`) VALUES (?, ?, ?, ?, ?);";
 const UPDATEDRIVERQUERY = "UPDATE `drivers` SET givenName = ?, familyName = ?, nationality = ?, dob = ? WHERE `driver_id` = ?;";
-const DELETEDRIVERQUERY = "DELETE FROM `drivers` WHERE `constructor_id` = ?;";
+const DELETEDRIVERQUERY = "DELETE FROM `drivers` WHERE `driver_id` = ?;";
 
 async function getAllDrivers() {
     return await executeWithResult(GETALLDRIVERSQUERY);
