@@ -1,15 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import basicAuth from 'express-basic-auth';
-import { Circuit, Constructor, Driver } from './logic/database/database-repository.js';
+import { Circuit, Constructor, Driver, Race } from './logic/database/database-repository.js';
 import { CustomError } from './logic/exceptions/errorhandling.js';
 
 const PORT = 3000;
 const ADMIN_USERS = {max: 'vers-tappen'};
 
 const SERVER_ERROR_CODE = 500;
+const SUCCESSFULL_CREATE_CODE = 201;
 const SUCCESSFULL_UPDATE_CODE = 201;
-const SUCCESSFULL_DELETION_CODE = 204;
+const SUCCESSFULL_DELETE_CODE = 204;
 
 
 const app = express();
@@ -33,21 +34,21 @@ app.get('/circuits/:id', (req, res, next) => {
 
 app.post('/circuits', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     Circuit.create(req.body)
-        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
         .catch(err => next(err));
 });
 
 app.put('/circuits/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
     Circuit.update(id, req.body)
-        .then(() => res.send())
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err));
 });
 
 app.delete('/circuits/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
     Circuit.remove(id)
-        .then(() => res.send())
+        .then(() => res.status(SUCCESSFULL_DELETE_CODE).send())
         .catch(err => next(err));
 });
 // End of Circuit Endpoints
@@ -68,21 +69,21 @@ app.get('/constructors/:id', (req, res, next) => {
 
 app.post('/constructors', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     Constructor.create(req.body)
-        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
         .catch(err => next(err));
 });
 
 app.put('/constructors/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
     Constructor.update(id, req.body)
-        .then(() => res.send())
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err));
 });
 
 app.delete('/constructors/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
     Constructor.remove(id)
-        .then(() => res.send())
+        .then(() => res.status(SUCCESSFULL_DELETE_CODE).send())
         .catch(err => next(err));
 });
 // End of Constructor Endpoints
@@ -104,24 +105,60 @@ app.get('/drivers/:id', (req, res, next) => {
 
 app.post('/drivers', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     Driver.create(req.body)
-        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
         .catch(err => next(err));
 });
 
 app.put('/drivers/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
     Driver.update(id, req.body)
-        .then(() => res.send())
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err));
 });
 
 app.delete('/drivers/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
     Driver.remove(id)
-        .then(() => res.send())
+        .then(() => res.status(SUCCESSFULL_DELETE_CODE).send())
         .catch(err => next(err));
 });
 // End of Driver Endpoints
+
+// Race Endpoints
+
+app.get('/races', (req, res, next) => {
+    Race.getAllRaces()
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.get('/races/:id', (req, res, next) => {
+    const id = (req.params.id);
+    Race.getRaceFromId(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.post('/races', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
+    Race.create(req.body)
+        .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
+        .catch(err => next(err));
+});
+
+app.put('/races/:id', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
+    const id = (req.params.id);
+    Race.update(id)
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .catch(err => next(err))
+});
+
+app.delete('/races/:id', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
+    const id = (req.params.id);
+    Race.remove(id)
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .catch(err => next(err))
+});
+// End of Race Endpoints
 
 // Global Error Handler
 app.use((err, req, res, next) => {
