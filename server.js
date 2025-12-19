@@ -8,13 +8,16 @@ const PORT = 3000;
 const ADMIN_USERS = {max: 'vers-tappen'};
 
 const SERVER_ERROR_CODE = 500;
-const SUCCESFULL_CREATION_CODE = 201;
+const SUCCESSFULL_UPDATE_CODE = 201;
+const SUCCESSFULL_DELETION_CODE = 204;
 
 
 const app = express();
 app.use("/", express.static('public'));
 app.use(cors());
+app.use(express.json());
 
+// Circuit Endpoints
 app.get('/circuits', (req, res, next) => {
     Circuit.getAllCircuits()
         .then(results => res.json(results))
@@ -28,13 +31,28 @@ app.get('/circuits/:id', (req, res, next) => {
         .catch(err => next(err));
 });
 
-app.use(express.json());
 app.post('/circuits', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
     Circuit.create(req.body)
-        .then(() => res.status(SUCCESFULL_CREATION_CODE).send())
+        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err));
 });
 
+app.put('/circuits/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
+    const id = (req.params.id);
+    Circuit.update(id, req.body)
+        .then(() => res.send())
+        .catch(err => next(err));
+});
+
+app.delete('/circuits/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
+    const id = (req.params.id);
+    Circuit.remove(id)
+        .then(() => res.send())
+        .catch(err => next(err));
+});
+// End of Circuit Endpoints
+
+// Global Error Handler
 app.use((err, req, res, next) => {
     if (err instanceof CustomError)
         res.status(err.statusCode).send(err.message);
