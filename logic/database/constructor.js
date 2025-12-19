@@ -18,11 +18,14 @@ async function getConstructorFromId(id) {
 }
 
 async function create(data) {
+
     if (data === undefined)
         throw new BodyParsingError("Body cannot be empty");
     const { constructor_id, name, nationality, wikipedia_url } = data;
     if (constructor_id === undefined || name === undefined )
         throw new BodyParsingError("Body must contain all constructor fields");
+    const existingConstructor = await getConstructorFromId(constructor_id).catch(() => null);
+    if (existingConstructor !== null) throw new BodyParsingError("Constructor ID already exists");
     return await executeWithoutResult(CREATECONSTRUCTORQUERY, constructor_id, name, nationality, wikipedia_url);
 }
 

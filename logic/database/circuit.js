@@ -23,6 +23,8 @@ async function create(data) {
     const { circuit_id, name, lat, long, locality, country, wikipedia_url } = data;
     if (circuit_id === undefined || name === undefined )
         throw new BodyParsingError("Body must contain all circuit fields");
+    const existingCircuit = await getCircuitFromId(circuit_id).catch(() => null);
+    if (existingCircuit !== null) throw new BodyParsingError("Circuit ID already exists");
     return await executeWithoutResult(CREATECIRCUITQUERY, circuit_id, name, lat, long, locality, country, wikipedia_url);
 }
 
