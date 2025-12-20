@@ -48,14 +48,15 @@ header {
 
     width: 100vw;
     height: 20%;
-    border-bottom: var(--accent-gray-color-1);
+    border-bottom: 1px solid var(--accent-gray-color-3);
 
     margin-bottom: 2rem;
+    padding: 1rem;
 }
 
 .f1-logo {
-    height: 6.5rem;
-    width: 10rem;
+    height: 3.5rem;
+    width: 6rem;
 }
 
 main {
