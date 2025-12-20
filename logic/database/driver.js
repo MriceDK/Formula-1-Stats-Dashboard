@@ -1,11 +1,26 @@
 import {executeWithoutResult, executeWithResult} from "./data/connection.js";
 import {BodyParsingError, UnexistingResourceError} from "../exceptions/errorhandling.js";
 
+// -------------------
+// # GENERAL QUERIES #
+// -------------------
 const GETALLDRIVERSQUERY = "SELECT * FROM `drivers`;";
 const SINGLEDRIVERQUERY = "SELECT * from `drivers` WHERE `driver_id` = ?;";
 const CREATEDRIVERQUERY = "INSERT INTO `drivers` (`driver_id`, `givenName`, `familyName`, `nationality`, `dob`) VALUES (?, ?, ?, ?, ?);";
 const UPDATEDRIVERQUERY = "UPDATE `drivers` SET givenName = ?, familyName = ?, nationality = ?, dob = ? WHERE `driver_id` = ?;";
 const DELETEDRIVERQUERY = "DELETE FROM `drivers` WHERE `driver_id` = ?;";
+
+// -------------------
+// # SPECIAL QUERIES #
+// -------------------
+
+const TOTALWINSSINGLEDRIVER = `SELECT d.givenName || ' ' || d.familyName AS driver, COUNT(*) AS total_wins, COUNT(r.race_id) AS total_races, ROUND(COUNT(*) * 100.0 / COUNT(r.race_id), 2) AS win_percentage FROM results r JOIN drivers d ON r.driver_id = d.driver_id WHERE d.driver_id = ? AND r.position_order = 1 GROUP BY r.driver_id;`;
+
+const QUALIFYINGSTATSSINGLEDRIVER = `SELECT d.givenName || ' ' || d.familyName AS driver, COUNT(CASE WHEN q.position = 1 THEN 1 END) AS poles, COUNT(CASE WHEN q.position <= 3 THEN 1 END) AS top_3_qualifying, ROUND(AVG(q.position), 2) AS avg_qual_pos, COUNT(*) AS total_sessions FROM qualifying q JOIN drivers d ON q.driver_id = d.driver_id WHERE d.driver_id = ? GROUP BY q.driver_id;`;
+
+const OVERTAKINGABILITYSINGLEDRIVER = `SELECT d.givenName || ' ' || d.familyName AS driver, COUNT(*) AS races, ROUND(AVG(r.grid * 1.0), 2) AS avg_start_pos, ROUND(AVG(r.position_order * 1.0), 2) AS avg_finish_pos, ROUND(AVG(r.position_order - r.grid), 2) AS avg_positions_gained, ROUND(SUM(CASE WHEN r.position_order < r.grid THEN 1 ELSE 0 END)*100.0/COUNT(*), 2) AS beat_start_pct FROM results r JOIN drivers d ON r.driver_id = d.driver_id WHERE d.driver_id = ? AND r.grid > 0 AND r.position_order > 0 GROUP BY r.driver_id;`;
+
+
 
 async function getAllDrivers() {
     return await executeWithResult(GETALLDRIVERSQUERY);
@@ -44,4 +59,16 @@ async function remove(id) {
     if (affected === 0) throw new UnexistingResourceError("Invalid id");
 }
 
-export { getAllDrivers, getDriverFromId, create, update, remove };
+async function getTotalWinsById(id) {
+    return await executeWithResult(TOTALWINSSINGLEDRIVER, id);
+}
+
+async function getQualifyingStatsById(id) {
+    return await executeWithResult(QUALIFYINGSTATSSINGLEDRIVER, id);
+}
+
+async function getOverTakingAbilityById(id) {
+    return await executeWithResult(OVERTAKINGABILITYSINGLEDRIVER, id);
+}
+
+export { getAllDrivers, getDriverFromId, create, update, remove, getTotalWinsById, getQualifyingStatsById, getOverTakingAbilityById };

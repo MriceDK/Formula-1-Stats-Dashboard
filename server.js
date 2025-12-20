@@ -122,6 +122,28 @@ app.delete('/drivers/:id', basicAuth({users: ADMIN_USERS}), (req, res, next) => 
         .then(() => res.status(SUCCESSFULL_DELETE_CODE).send())
         .catch(err => next(err));
 });
+
+app.get('/drivers/:id/wins', (req, res, next) => {
+    const id = (req.params.id);
+    Driver.getTotalWinsById(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.get('/drivers/:id/qualifying', (req, res, next) => {
+    const id = (req.params.id);
+    Driver.getQualifyingStatsById(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.get('/drivers/:id/overtaking', (req, res, next) => {
+    const id = (req.params.id);
+    Driver.getOverTakingAbilityById(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
 // End of Driver Endpoints
 
 // Race Endpoints
