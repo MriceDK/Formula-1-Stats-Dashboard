@@ -221,7 +221,12 @@ main {
 
 .normal-stats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+    "races win"
+    "start finish"
+    "teammates teammates";
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
     gap: 1.5rem;
     font-size: 1.1rem;
 }
@@ -251,6 +256,29 @@ main {
     color: var(--main-red-color);
     min-width: 60px;
     text-align: right;
+}
+
+#races {
+    grid-area: races;
+}
+
+#win {
+    grid-area: win;
+
+}
+
+#start {
+    grid-area: start;
+
+}
+#finish {
+    grid-area: finish;
+
+}
+
+#teammates{
+    grid-area: teammates;
+
 }
 
 @keyframes slideInUp {
