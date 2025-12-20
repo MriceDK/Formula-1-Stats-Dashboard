@@ -25,7 +25,7 @@ async function getCachedDrivers() {
 
 async function getAllDriverNames() {
     const driverSelect = document.querySelector(".drivers");
-    driverSelect.innerHTML = `<option>- Select Your Driver -</option>`;
+    driverSelect.innerHTML = `<option value="">- Select Your Driver -</option>`;
     const drivers = await getCachedDrivers();
 
     const filterValue = document.querySelector(".driver-name").value.trim().toLowerCase();
@@ -43,9 +43,20 @@ function driverOptionElement(driver_id, driver_name) {
 
 async function updateSelectedDriver(e) {
     const driver_id = e.target.value;
-    const driverObject = await getCachedDrivers().then(d => d.filter(d => d.driver_id === driver_id)[0]);
-    console.log(driverObject);
-    document.querySelector(".selected-driver-name").innerHTML = driverObject.givenName.concat(" ", driverObject.familyName);
+    if (driver_id !== "") {
+        const driverObject = await getCachedDrivers().then(d => d.filter(d => d.driver_id === driver_id)[0]);
+        const verifiedDriverId = driverObject.driver_id;
+        const winsObject = await fetch(`${BASEURL}/drivers/${verifiedDriverId}/wins`).then(res => res.json());
+
+
+        document.querySelector(".selected-driver-name").innerHTML = driverObject.givenName.concat(" ", driverObject.familyName);
+        document.querySelector(".total-races").innerHTML = winsObject.total_races;
+        document.querySelector(".win-percentage").innerHTML = winsObject.win_percentage;
+
+        document.querySelector(".driver-stats").classList.remove("hidden");
+    } else {
+        document.querySelector(".driver-stats").classList.add("hidden");
+    }
 }
 
 

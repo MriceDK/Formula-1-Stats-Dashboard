@@ -67,7 +67,7 @@ main {
 
     width: 75%;
     padding: 1rem;
-    gap: 5rem;
+    gap: 1.5rem;
 
     font-family: formula-1, sans-serif;
     color: var(--main-text-color);
@@ -173,5 +173,9 @@ main {
 
 .driver-stats {
 
+}
+
+.hidden {
+    display: none;
 }
 
