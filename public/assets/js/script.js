@@ -50,7 +50,7 @@ async function loadDriverData(driver_id) {
 
     document.querySelector(".selected-driver-name").innerHTML = driverObject.givenName.concat(" ", driverObject.familyName);
 
-    document.querySelector(".total-races").innerHTML = winsObject.total_races;
+    document.querySelector(".total-races").innerHTML = `${winsObject.total_races} races`;
     document.querySelector(".win-percentage").innerHTML = `${winsObject.win_percentage}%`;
 
     document.querySelector(".avg-quali-pos").innerHTML = overtakingObject.avg_start_pos;
