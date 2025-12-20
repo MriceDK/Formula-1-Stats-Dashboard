@@ -16,22 +16,25 @@
     <h1>Formula 1 Stats</h1>
 </header>
 <main>
-    <form class="search-driver-form">
-        <label>
-            Search Drivers
-            <input class="driver-name" type="text">
-        </label>
-        <input type="submit" value="Search Driver">
-        <label>
-            Select Your Driver
-            <select class="drivers">
-                <option>-Select Your Driver-</option>
-            </select>
-        </label>
-    </form>
-    <div class="driver-stats">
-
+    <div class="box driver-select">
+        <form class="search-driver-form">
+            <label>
+                Search Drivers
+                <input class="driver-name" type="text">
+            </label>
+            <input type="submit" value="Search Driver">
+            <label>
+                Select Your Driver
+                <select class="drivers">
+                    <option>- Select Your Driver -</option>
+                </select>
+            </label>
+        </form>
     </div>
+    <section class="box driver-stats">
+        <h2><span class="selected-driver-name"></span>'s stats</h2>
+
+    </section>
 </main>
 
 </body>
