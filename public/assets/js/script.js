@@ -30,7 +30,6 @@ async function getAllDriverNames() {
 
     const filterValue = document.querySelector(".driver-name").value.trim().toLowerCase();
     const filteredDrivers = drivers.filter(driver => driver.givenName.concat(" ", driver.familyName).toLowerCase().includes(filterValue));
-    console.log(filteredDrivers);
     filteredDrivers.forEach(driver => {
         const { driver_id, givenName, familyName} = driver;
         const fullName = givenName.concat(" ", familyName);

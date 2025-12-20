@@ -49,7 +49,6 @@ async function create(data) {
 }
 
 async function update(id, data) {
-    console.log(data);
     if (data === undefined) throw new BodyParsingError("Body cannot be empty");
     const { season, round_num, race_name, date, time, circuit_id } = data;
     if (season === undefined || circuit_id === undefined)

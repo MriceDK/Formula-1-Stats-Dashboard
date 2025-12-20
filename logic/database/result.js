@@ -85,7 +85,6 @@ async function update(raceId, driverId, data) {
 }
 
 async function remove(raceId, driverId) {
-    console.log(raceId, driverId);
     const affected = await executeWithoutResult(DELETERESULTQUERY, raceId, driverId);
     if (affected === 0) throw new UnexistingResourceError("Invalid id");
 }
