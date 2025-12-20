@@ -49,11 +49,12 @@ async function create(data) {
 }
 
 async function update(id, data) {
+    console.log(data);
     if (data === undefined) throw new BodyParsingError("Body cannot be empty");
-    const { race_id, season, round_num, race_name, date, time, circuit_id } = data;
-    if (race_id === undefined)
+    const { season, round_num, race_name, date, time, circuit_id } = data;
+    if (season === undefined || circuit_id === undefined)
         throw new BodyParsingError("Body must contain all   race fields");
-    const affected = await executeWithoutResult(UPDATERACEQUERY, race_id, season, round_num, race_name, date, time, circuit_id, id);
+    const affected = await executeWithoutResult(UPDATERACEQUERY, season, round_num, race_name, date, time, circuit_id, id);
     if (affected === 0) throw new UnexistingResourceError("Invalid id");
     return affected;
 }

@@ -146,7 +146,7 @@ app.post('/races', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
 
 app.put('/races/:id', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
     const id = (req.params.id);
-    Race.update(id)
+    Race.update(id, req.body)
         .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err))
 });
