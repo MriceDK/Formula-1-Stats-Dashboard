@@ -151,6 +151,13 @@ app.get('/drivers/:id/teammates', (req, res, next) => {
         .catch(err => next(err));
 });
 
+app.get('/drivers/:id/positions', (req, res, next) => {
+    const id = (req.params.id);
+    Driver.getAllPositionsById(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
 // End of Driver Endpoints
 
 // Race Endpoints
