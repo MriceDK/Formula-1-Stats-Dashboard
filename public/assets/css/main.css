@@ -68,7 +68,7 @@ main {
     padding: 1rem;
 
     background-color: var(--secondary-black-color);
-    border-radius: 5rem;
+    border-radius: 1rem;
 
     font-family: formula-1, sans-serif;
     color: var(--main-text-color);
