@@ -183,16 +183,16 @@ app.post('/results', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
 app.put('/:raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
     const raceId = (req.params.raceId);
     const driverId = (req.params.driverId);
-    Result.update(raceId, driverId)
+    Result.update(raceId, driverId, req.body)
         .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err))
 });
 
-app.delete(':raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
+app.delete('/:raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
     const raceId = (req.params.raceId);
     const driverId = (req.params.driverId);
     Result.remove(raceId, driverId)
-        .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
+        .then(() => res.status(SUCCESSFULL_DELETE_CODE).send())
         .catch(err => next(err))
 });
 // End of Result Endpoints

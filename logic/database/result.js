@@ -38,15 +38,8 @@ const SINGLERESULTQUERY = `
   WHERE re.race_id = ? AND re.driver_id = ?;
 `.replaceAll("\n", "");
 const CREATERESULTQUERY = "INSERT INTO `results` (`race_id`, `driver_id`, `constructor_id`, `grid`, `position`, `position_order`, `points`, `laps`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-const UPDATERESULTQUERY = `
-  UPDATE results
-  SET constructor_id = ?, grid = ?, position = ?, position_order = ?, points = ?, laps = ?, status = ?
-  WHERE race_id = ? AND driver_id = ?;
-`;
-const DELETERESULTQUERY = `
-  DELETE FROM results
-  WHERE race_id = ? AND driver_id = ?;
-`;
+const UPDATERESULTQUERY = `UPDATE results SET constructor_id = ?, grid = ?, position = ?, position_order = ?, points = ?, laps = ?, status = ? WHERE race_id = ? AND driver_id = ?;`;
+const DELETERESULTQUERY = `DELETE FROM results WHERE race_id = ? AND driver_id = ?;`;
 
 async function getAllResults() {
     return await executeWithResult(GETALLRESULTSQUERY);
@@ -92,6 +85,7 @@ async function update(raceId, driverId, data) {
 }
 
 async function remove(raceId, driverId) {
+    console.log(raceId, driverId);
     const affected = await executeWithoutResult(DELETERESULTQUERY, raceId, driverId);
     if (affected === 0) throw new UnexistingResourceError("Invalid id");
 }
