@@ -5,6 +5,7 @@ const cache = {
 }
 
 
+
 function init() {
     getAllDriverNames();
     document.querySelector(".search-driver-form").addEventListener("submit", e => {
@@ -13,17 +14,20 @@ function init() {
     });
 }
 
-async function getAllDriverNames() {
-    const driverSelect = document.querySelector(".drivers");
-    driverSelect.innerHTML = "";
-
+async function ensureDriversCached() {
     if (cache.drivers === null) {
         cache.drivers = await fetch(`${BASEURL}/drivers`).then(res => res.json());
         console.info("Drivers Cached");
     }
-    const drivers = cache.drivers;
+    return cache.drivers;
+}
 
-    const filterValue = document.querySelector(".driver-name").value.toLowerCase();
+async function getAllDriverNames() {
+    const driverSelect = document.querySelector(".drivers");
+    driverSelect.innerHTML = `<option>-Select Your Driver-</option>`;
+    const drivers = await ensureDriversCached();
+
+    const filterValue = document.querySelector(".driver-name").value.trim().toLowerCase();
     const filteredDrivers = drivers.filter(driver => driver.givenName.concat(" ", driver.familyName).toLowerCase().includes(filterValue));
     console.log(filteredDrivers);
     filteredDrivers.forEach(driver => {
