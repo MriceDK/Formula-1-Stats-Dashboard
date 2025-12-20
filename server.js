@@ -169,13 +169,13 @@ app.get('/results', (req, res, next) => {
 app.get('/:raceId/results/:driverId', (req, res, next) => {
     const raceId = (req.params.raceId);
     const driverId = (req.params.driverId);
-    Race.getRaceFromId(raceId, driverId)
+    Result.getRaceFromId(raceId, driverId)
         .then(results => res.json(results))
         .catch(err => next(err));
 });
 
 app.post('/results', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
-    Race.create(req.body)
+    Result.create(req.body)
         .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
         .catch(err => next(err));
 });
@@ -183,7 +183,7 @@ app.post('/results', basicAuth({users: ADMIN_USERS}), (req, res, next) => {
 app.put('/:raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
     const raceId = (req.params.raceId);
     const driverId = (req.params.driverId);
-    Race.update(raceId, driverId)
+    Result.update(raceId, driverId)
         .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err))
 });
@@ -191,7 +191,7 @@ app.put('/:raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, re
 app.delete(':raceId/results/:driverId', basicAuth({users : ADMIN_USERS}), (req, res, next) => {
     const raceId = (req.params.raceId);
     const driverId = (req.params.driverId);
-    Race.remove(raceId, driverId)
+    Result.remove(raceId, driverId)
         .then(() => res.status(SUCCESSFULL_UPDATE_CODE).send())
         .catch(err => next(err))
 });
