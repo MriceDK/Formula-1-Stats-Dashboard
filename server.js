@@ -169,7 +169,7 @@ app.get('/results', (req, res, next) => {
 app.get('/:raceId/results/:driverId', (req, res, next) => {
     const raceId = (req.params.raceId);
     const driverId = (req.params.driverId);
-    Result.getRaceFromId(raceId, driverId)
+    Result.getResultFromId(raceId, driverId)
         .then(results => res.json(results))
         .catch(err => next(err));
 });
