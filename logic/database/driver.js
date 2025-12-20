@@ -59,19 +59,27 @@ async function remove(id) {
 }
 
 async function getTotalWinsById(id) {
-    return await executeWithResult(TOTALWINSSINGLEDRIVER, id);
+    const driver = await executeWithResult(TOTALWINSSINGLEDRIVER, id);
+    if (driver === undefined) throw new UnexistingResourceError("Invalid Driver ID");
+    return driver[0];
 }
 
 async function getQualifyingStatsById(id) {
-    return await executeWithResult(QUALIFYINGSTATSSINGLEDRIVER, id);
+    const driver = await executeWithResult(QUALIFYINGSTATSSINGLEDRIVER, id);
+    if (driver === undefined) throw new UnexistingResourceError("Invalid Driver ID");
+    return driver[0];
 }
 
 async function getOverTakingAbilityById(id) {
-    return await executeWithResult(OVERTAKINGABILITYSINGLEDRIVER, id);
+    const driver = await executeWithResult(OVERTAKINGABILITYSINGLEDRIVER, id);
+    if (driver === undefined) throw new UnexistingResourceError("Invalid Driver ID");
+    return driver[0];
 }
 
 async function getDriverVsTeammateById(id) {
-    return await executeWithResult(DRIVERVSTEAMMATESTATS, id);
+    const driver = await executeWithResult(DRIVERVSTEAMMATESTATS, id);
+    if (driver === undefined) throw new UnexistingResourceError("Invalid Driver ID");
+    return driver[0];
 }
 
 export { getAllDrivers, getDriverFromId, create, update, remove, getTotalWinsById, getQualifyingStatsById, getOverTakingAbilityById, getDriverVsTeammateById };
