@@ -8,7 +8,7 @@ const UPDATECONSTRUCTORQUERY = "UPDATE `constructors` SET name = ?, nationality 
 const DELETECONSTRUCTORQUERY = "DELETE FROM `constructors` WHERE `constructor_id` = ?;";
 
 async function getAllConstructors() {
-    return await executeWithoutResult(GETALLCONSTRUCTORSQUERY);
+    return await executeWithResult(GETALLCONSTRUCTORSQUERY);
 }
 
 async function getConstructorFromId(id) {
