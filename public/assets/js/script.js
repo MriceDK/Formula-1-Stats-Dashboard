@@ -51,12 +51,12 @@ async function loadDriverData(driver_id) {
     document.querySelector(".selected-driver-name").innerHTML = driverObject.givenName.concat(" ", driverObject.familyName);
 
     document.querySelector(".total-races").innerHTML = winsObject.total_races;
-    document.querySelector(".win-percentage").innerHTML = winsObject.win_percentage;
+    document.querySelector(".win-percentage").innerHTML = `${winsObject.win_percentage}%`;
 
     document.querySelector(".avg-quali-pos").innerHTML = overtakingObject.avg_start_pos;
     document.querySelector(".avg-finish-pos").innerHTML = overtakingObject.avg_finish_pos;
 
-    document.querySelector(".vs-teammates").innerHTML = teammateVSObject.teammate_dominance_score;
+    document.querySelector(".vs-teammates").innerHTML = `${teammateVSObject.teammate_dominance_score}%`;
 }
 
 async function updateSelectedDriver(e) {
