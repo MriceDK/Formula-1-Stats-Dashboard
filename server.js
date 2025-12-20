@@ -208,5 +208,5 @@ app.use((err, req, res) => {
 });
 
 app.listen(PORT, () =>
-    console.log(`MovieDB listening on ${PORT}`)
+    console.log(`Formula-1-DB listening on ${PORT}`)
 );
