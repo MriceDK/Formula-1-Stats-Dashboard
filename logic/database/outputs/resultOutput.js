@@ -1,79 +1,25 @@
-const GETALLRACES = [
+const GETALLRESULTS = [
     {
-        "grid": 0,
-        "position": "W",
-        "position_order": 21,
+        "race_id": "1950_1",
+        "driver_id": "bira",
+        "constructor_id": "maserati",
+        "grid": 5,
+        "position": "R",
+        "position_order": 14,
         "points": 0,
-        "laps": 0,
-        "status": "Withdrew",
-        "race": {
-            "race_id": "1962_4",
-            "race_name": "French Grand Prix",
-            "season": 1962,
-            "round_num": 4,
-            "date": "1962-07-07T23:00:00.000Z",
-            "time": "",
-            "circuit_id": "essarts"
-        },
-        "driver": {
-            "driver_id": "abate",
-            "givenName": "Carlo",
-            "familyName": "Abate",
-            "dob": "1932-07-09T23:00:00.000Z",
-            "nationality": "Italian"
-        },
-        "constructor": {
-            "constructor_id": "lotus-climax",
-            "name": "Lotus-Climax",
-            "nationality": "British"
-        },
-        "circuit": {
-            "circuit_id": "essarts",
-            "name": "Rouen-Les-Essarts",
-            "lat": 49.3306,
-            "long": 1.00458,
-            "locality": "Rouen",
-            "country": "France",
-            "wikipedia_url": "https://en.wikipedia.org/wiki/Rouen-Les-Essarts\r"
-        }
+        "laps": 49,
+        "status": "Out of fuel"
     },
     {
-        "grid": 20,
-        "position": "R",
-        "position_order": 17,
-        "points": 0,
-        "laps": 23,
-        "status": "Magneto",
-        "race": {
-            "race_id": "1951_1",
-            "race_name": "Swiss Grand Prix",
-            "season": 1951,
-            "round_num": 1,
-            "date": "1951-05-26T23:00:00.000Z",
-            "time": "",
-            "circuit_id": "bremgarten"
-        },
-        "driver": {
-            "driver_id": "abecassis",
-            "givenName": "George",
-            "familyName": "Abecassis",
-            "dob": "1913-03-21T00:00:00.000Z",
-            "nationality": "British"
-        },
-        "constructor": {
-            "constructor_id": "hwm",
-            "name": "HWM",
-            "nationality": "British"
-        },
-        "circuit": {
-            "circuit_id": "bremgarten",
-            "name": "Circuit Bremgarten",
-            "lat": 46.9589,
-            "long": 7.40194,
-            "locality": "Bern",
-            "country": "Switzerland",
-            "wikipedia_url": "https://en.wikipedia.org/wiki/Circuit_Bremgarten\r"
-        }
+        "race_id": "1950_1",
+        "driver_id": "cabantous",
+        "constructor_id": "lago",
+        "grid": 6,
+        "position": "4",
+        "position_order": 4,
+        "points": 3,
+        "laps": 68,
+        "status": "+2 Laps"
     },
 ];
 
@@ -116,8 +62,8 @@ const GETSINGLERESULT = {
     }
 };
 
-const CREATERACE = "";
+const CREATERESULT = "";
 
-const UPDATERACE = "";
+const UPDATERESULT = "";
 
-const REMOVERACE = "";
+const REMOVERESULT = "";
