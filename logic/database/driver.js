@@ -15,10 +15,9 @@ const DELETEDRIVERQUERY = "DELETE FROM `drivers` WHERE `driver_id` = ?;";
 // -------------------
 
 const TOTALWINSSINGLEDRIVER = `SELECT d.givenName || ' ' || d.familyName AS driver, COUNT(*) AS total_wins, COUNT(r.race_id) AS total_races, ROUND(COUNT(*) * 100.0 / COUNT(r.race_id), 2) AS win_percentage FROM results r JOIN drivers d ON r.driver_id = d.driver_id WHERE d.driver_id = ? AND r.position_order = 1 GROUP BY r.driver_id;`;
-
 const QUALIFYINGSTATSSINGLEDRIVER = `SELECT d.givenName || ' ' || d.familyName AS driver, COUNT(CASE WHEN q.position = 1 THEN 1 END) AS poles, COUNT(CASE WHEN q.position <= 3 THEN 1 END) AS top_3_qualifying, ROUND(AVG(q.position), 2) AS avg_qual_pos, COUNT(*) AS total_sessions FROM qualifying q JOIN drivers d ON q.driver_id = d.driver_id WHERE d.driver_id = ? GROUP BY q.driver_id;`;
-
 const OVERTAKINGABILITYSINGLEDRIVER = `SELECT d.givenName || ' ' || d.familyName AS driver, COUNT(*) AS races, ROUND(AVG(r.grid * 1.0), 2) AS avg_start_pos, ROUND(AVG(r.position_order * 1.0), 2) AS avg_finish_pos, ROUND(AVG(r.position_order - r.grid), 2) AS avg_positions_gained, ROUND(SUM(CASE WHEN r.position_order < r.grid THEN 1 ELSE 0 END)*100.0/COUNT(*), 2) AS beat_start_pct FROM results r JOIN drivers d ON r.driver_id = d.driver_id WHERE d.driver_id = ? AND r.grid > 0 AND r.position_order > 0 GROUP BY r.driver_id;`;
+const DRIVERVSTEAMMATESTATS = `SELECT CONCAT(dt.givenName, ' ', dt.familyName) AS teammate, COUNT(*) AS shared_races, ROUND(AVG(q1.position < q2.position)*100, 2) AS qual_win_pct, ROUND(AVG(r1.position_order < r2.position_order)*100, 2) AS race_win_pct FROM results r1 JOIN results r2 ON r2.race_id = r1.race_id AND r2.constructor_id = r1.constructor_id AND r2.driver_id != r1.driver_id JOIN qualifying q1 ON q1.race_id = r1.race_id AND q1.driver_id = r1.driver_id JOIN qualifying q2 ON q2.race_id = r2.race_id AND q2.driver_id = r2.driver_id JOIN drivers dt ON dt.driver_id = r2.driver_id WHERE r1.driver_id = ? AND q1.position IS NOT NULL AND q2.position IS NOT NULL GROUP BY r2.driver_id HAVING shared_races >= 5 ORDER BY qual_win_pct DESC`;
 
 
 
@@ -71,4 +70,8 @@ async function getOverTakingAbilityById(id) {
     return await executeWithResult(OVERTAKINGABILITYSINGLEDRIVER, id);
 }
 
-export { getAllDrivers, getDriverFromId, create, update, remove, getTotalWinsById, getQualifyingStatsById, getOverTakingAbilityById };
+async function getDriverVsTeammateById(id) {
+    return await executeWithResult(DRIVERVSTEAMMATESTATS, id);
+}
+
+export { getAllDrivers, getDriverFromId, create, update, remove, getTotalWinsById, getQualifyingStatsById, getOverTakingAbilityById, getDriverVsTeammateById };
