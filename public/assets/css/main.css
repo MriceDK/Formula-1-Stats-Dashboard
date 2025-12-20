@@ -1,0 +1,75 @@
+@font-face {
+    font-family: formula-1-bold;
+    src: url("../fonts/Formula1-Bold_web_0.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: formula-1;
+    src: url("../fonts/Formula1-Regular_web_0.ttf") format("truetype");
+}
+
+:root {
+    --main-black-color : #15151e;
+    --secondary-black-color: #000000;
+
+    --accent-gray-color-1: #1c1c25;
+    --accent-gray-color-2: #303037;
+    --accent-gray-color-3: #37373e;
+    --accent-gray-color-4: #47464c;
+
+    --main-red-color: #e10600;
+
+    --main-text-color: #ffffff;
+
+    --main-link-color: #adb0db;
+}
+
+body {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0;
+    padding: 0;
+    background-color: var(--main-black-color);
+
+}
+header {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+
+    font-family: formula-1-bold, sans-serif;
+    font-size: 2rem;
+    color: var(--main-text-color);
+
+    width: 100vw;
+    height: 20%;
+    border-bottom: var(--accent-gray-color-1);
+
+    margin-bottom: 2rem;
+}
+
+.f1-logo {
+    height: 6.5rem;
+    width: 10rem;
+}
+
+main {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+
+    width: 75%;
+    padding: 1rem;
+
+    background-color: var(--secondary-black-color);
+    border-radius: 5rem;
+
+    font-family: formula-1, sans-serif;
+    color: var(--main-text-color);
+}
