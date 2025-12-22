@@ -20,4 +20,4 @@ class BodyParsingError extends CustomError {
     }
 }
 
-export { CustomError, UnexistingResourceError, BodyParsingError }
+export { CustomError, UnexistingResourceError, BodyParsingError };

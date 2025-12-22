@@ -178,4 +178,4 @@ function mapResultRow(row) {
 
 
 
-export { getAllResults, getResultFromId, create, update, remove}
+export { getAllResults, getResultFromId, create, update, remove };

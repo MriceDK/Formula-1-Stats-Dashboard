@@ -66,7 +66,6 @@ async function remove(id) {
 function mapRaceRow(row) {
 
     const {
-        circuit_id,
         c_circuit_id, c_name, c_lat, c_long,
         c_locality, c_country, c_wikipedia_url,
         ...raceFields

@@ -17,4 +17,4 @@ function takeFirst(results) {
     return results[0];
 }
 
-export { getDate, flatten, takeFirst }
+export { getDate, flatten, takeFirst };

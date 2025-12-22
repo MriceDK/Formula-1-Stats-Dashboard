@@ -218,8 +218,7 @@ async function getDriverPointsPerSeasonById(id) {
 
     driverPoints.forEach(row => {
         const seasonKey = String(row.season);
-        const points = row.total_points !== null ? Number(row.total_points) : 0;
-        pps.pointsPerSeason[seasonKey] = points;
+        pps.pointsPerSeason[seasonKey] = row.total_points !== null ? Number(row.total_points) : 0;
     });
 
     return pps;
@@ -240,22 +239,6 @@ async function getDriverRetirementsById(id) {
     });
 
     return retirement;
-}
-
-const retirement = {
-    driver_id: "driver",
-    retirements : {
-        " Reason" : 5,
-        " Mechanical" : 3
-    }
-}
-
-const pps = {
-    driver_id: "driver",
-    pointsPerSeason : {
-        "2024" : 400,
-        " 2025" : 3
-    }
 }
 
 export {
