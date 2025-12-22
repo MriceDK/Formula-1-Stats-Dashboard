@@ -21,7 +21,7 @@ Harde deadline om alle tutorials af te hebben is **zondag 14 december om 23:59**
 ## Opdracht
 
 - [x] Dataset
-- [ ] Weergeven van data
+- [x] Weergeven van data
 - [ ] Toevoegen van data
 - [x] Backend server
 - [ ] Real-time communication

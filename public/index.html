@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <script src="assets/js/script.js" type="module"></script>
+    <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js "></script>
+    <script src=" https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 <body>
 <header>
@@ -42,9 +44,18 @@
 
         </div>
     </section>
-    <div class="box driver-stats-charts hidden">
-
-    </div>
+    <section class="box driver-stats-charts hidden">
+        <h2><span class="selected-driver-name"></span>'s Performance Charts</h2>
+        <div class="chart-container">
+            <canvas id="driver-positions-chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="points-per-season-chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="driver-retirement-chart"></canvas>
+        </div>
+    </section>
 </main>
 
 </body>
