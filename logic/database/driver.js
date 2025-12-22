@@ -98,6 +98,37 @@ GROUP BY driver_id, COALESCE(position_order, position)
 ORDER BY driver_id, position;
 `;
 
+const DRIVERPOINTSPERSEASONQUERY = `
+SELECT
+  d.driver_id,
+  CONCAT(d.givenName, ' ', d.familyName) AS full_name,
+  ra.season,
+  SUM(res.points) AS total_points
+FROM results res
+JOIN races ra ON res.race_id = ra.race_id
+JOIN drivers d ON res.driver_id = d.driver_id
+WHERE res.driver_id = ?
+GROUP BY d.driver_id, full_name, ra.season
+ORDER BY ra.season DESC, total_points DESC;`;
+
+const DRIVERRETIREMENTSQUERY = `
+SELECT
+  ra.season,
+  ra.round_num AS round,
+  ra.race_name AS race_name,
+  res.race_id,
+  res.position,
+  res.laps,
+  res.status
+FROM results res
+JOIN races ra ON res.race_id = ra.race_id
+WHERE res.driver_id = ?
+  AND (
+    LOWER(res.status) LIKE '%retired%'
+    OR res.position = 'R'
+  )
+ORDER BY ra.season DESC, ra.round_num;`;
+
 
 
 
@@ -176,6 +207,57 @@ async function getAllPositionsById(id) {
     return driverData;
 }
 
+async function getDriverPointsPerSeasonById(id) {
+    const driverPoints = await executeWithResult(DRIVERPOINTSPERSEASONQUERY, id);
+    if (driverPoints === undefined) throw new UnexistingResourceError("Invalid Driver ID");
+
+    const pps = {
+        driver_id: id,
+        pointsPerSeason: {}
+    };
+
+    driverPoints.forEach(row => {
+        const seasonKey = String(row.season);
+        const points = row.total_points !== null ? Number(row.total_points) : 0;
+        pps.pointsPerSeason[seasonKey] = points;
+    });
+
+    return pps;
+}
+
+async function getDriverRetirementsById(id) {
+    const rows = await executeWithResult(DRIVERRETIREMENTSQUERY, id);
+    if (rows === undefined) throw new UnexistingResourceError("Invalid Driver ID");
+
+    const retirement = {
+        driver_id: id,
+        retirements: {}
+    };
+
+    rows.forEach(r => {
+        const reason = (r.status || 'Unknown').trim();
+        retirement.retirements[reason] = (retirement.retirements[reason] || 0) + 1;
+    });
+
+    return retirement;
+}
+
+const retirement = {
+    driver_id: "driver",
+    retirements : {
+        " Reason" : 5,
+        " Mechanical" : 3
+    }
+}
+
+const pps = {
+    driver_id: "driver",
+    pointsPerSeason : {
+        "2024" : 400,
+        " 2025" : 3
+    }
+}
+
 export {
     getAllDrivers,
     getDriverFromId,
@@ -186,6 +268,8 @@ export {
     getQualifyingStatsById,
     getOverTakingAbilityById,
     getDriverVsTeammateById,
-    getAllPositionsById
+    getAllPositionsById,
+    getDriverPointsPerSeasonById,
+    getDriverRetirementsById
 };
 

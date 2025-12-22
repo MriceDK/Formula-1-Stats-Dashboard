@@ -158,6 +158,20 @@ app.get('/drivers/:id/positions', (req, res, next) => {
         .catch(err => next(err));
 });
 
+app.get('/drivers/:id/points', (req, res, next) => {
+    const id = (req.params.id);
+    Driver.getDriverPointsPerSeasonById(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
+app.get('/drivers/:id/retirements', (req, res, next) => {
+    const id = (req.params.id);
+    Driver.getDriverRetirementsById(id)
+        .then(results => res.json(results))
+        .catch(err => next(err));
+});
+
 // End of Driver Endpoints
 
 // Race Endpoints
