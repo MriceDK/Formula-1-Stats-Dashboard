@@ -20,6 +20,12 @@ Harde deadline om alle tutorials af te hebben is **zondag 14 december om 23:59**
 
 ## Opdracht
 
+- [x] Dataset
+- [ ] Weergeven van data
+- [ ] Toevoegen van data
+- [x] Backend server
+- [ ] Real-time communication
+
 Voor de opdracht bouwen jullie een web-applicatie die data visualiseert.
 
 Deadline van deze opdracht is zondag 4 januari 23:59. De volgende zaken moeten ingediend worden:
