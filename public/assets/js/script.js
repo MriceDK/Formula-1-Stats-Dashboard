@@ -1,13 +1,13 @@
+import {barChart, piechart} from "./charts.js";
+
 const BASEURL = 'http://localhost:3000';
-
-const cache = {
+const CACHE = {
     drivers : null,
-}
+};
 
 
-
-function init() {
-    getAllDriverNames();
+async function init() {
+    await getAllDriverNames();
     document.querySelector(".search-driver-form").addEventListener("submit", e => {
         e.preventDefault();
         getAllDriverNames().then(() => document.querySelector(".driver-stats-simple").classList.add("hidden"));
@@ -16,11 +16,11 @@ function init() {
 }
 
 async function getCachedDrivers() {
-    if (cache.drivers === null) {
-        cache.drivers = await fetch(`${BASEURL}/drivers`).then(res => res.json());
+    if (CACHE.drivers === null) {
+        CACHE.drivers = await fetch(`${BASEURL}/drivers`).then(res => res.json());
         console.info("Drivers Cached");
     }
-    return cache.drivers;
+    return CACHE.drivers;
 }
 
 async function getAllDriverNames() {
@@ -38,36 +38,56 @@ async function getAllDriverNames() {
 }
 
 function driverOptionElement(driver_id, driver_name) {
-    return `<option value="${driver_id}">${driver_name}</option>`
+    return `<option value="${driver_id}">${driver_name}</option>`;
 }
 
-async function loadDriverData(driver_id) {
-    const driverObject = await getCachedDrivers().then(d => d.filter(d => d.driver_id === driver_id)[0]);
-    const verifiedDriverId = driverObject.driver_id;
-    const winsObject = await fetch(`${BASEURL}/drivers/${verifiedDriverId}/wins`).then(res => res.json());
-    const overtakingObject = await fetch(`${BASEURL}/drivers/${verifiedDriverId}/overtaking`).then(res => res.json());
-    const teammateVSObject = await fetch(`${BASEURL}/drivers/${verifiedDriverId}/teammates`).then(res => res.json());
+async function loadSimpleDriverData(driver_id) {
 
-    document.querySelector(".selected-driver-name").innerHTML = driverObject.givenName.concat(" ", driverObject.familyName);
+    const winsObject = await fetch(`${BASEURL}/drivers/${driver_id}/wins`).then(res => res.json());
+    const overtakingObject = await fetch(`${BASEURL}/drivers/${driver_id}/overtaking`).then(res => res.json());
+    const teammateVSObject = await fetch(`${BASEURL}/drivers/${driver_id}/teammates`).then(res => res.json());
 
-    document.querySelector(".total-races").innerHTML = `${winsObject.total_races} races`;
-    document.querySelector(".win-percentage").innerHTML = `${winsObject.win_percentage}%`;
+    document.querySelector(".total-races").innerHTML = `${winsObject.total_races === null ? "N/A" : winsObject.total_races} races`;
+    document.querySelector(".win-percentage").innerHTML = `${winsObject.win_percentage === null ? "N/A" : winsObject.win_percentage}%`;
 
-    document.querySelector(".avg-quali-pos").innerHTML = overtakingObject.avg_start_pos;
-    document.querySelector(".avg-finish-pos").innerHTML = overtakingObject.avg_finish_pos;
+    document.querySelector(".avg-quali-pos").innerHTML = overtakingObject.avg_start_pos === null ? "N/A" : overtakingObject.avg_start_pos;
+    document.querySelector(".avg-finish-pos").innerHTML = overtakingObject.avg_finish_pos === null ? "N/A" : overtakingObject.avg_finish_pos;
 
-    document.querySelector(".vs-teammates").innerHTML = `${teammateVSObject.teammate_dominance_score}%`;
+    document.querySelector(".vs-teammates").innerHTML = `${teammateVSObject.teammate_dominance_score === null ? "N/A" : teammateVSObject.teammate_dominance_score}%`;
+}
+
+async function loadDriverDetailedStats(driver_id) {
+    const totalPositions = await fetch(`${BASEURL}/drivers/${driver_id}/positions`).then(res => res.json());
+    const pointsPerSeason = await fetch(`${BASEURL}/drivers/${driver_id}/points`).then(res => res.json());
+    const retirements = await fetch(`${BASEURL}/drivers/${driver_id}/retirements`).then(res => res.json());
+
+    const ctxDPC = document.querySelector('#driver-positions-chart').getContext('2d');
+    const ctxPPS = document.querySelector('#points-per-season-chart').getContext('2d');
+    const ctxRetirements = document.querySelector('#driver-retirement-chart').getContext('2d');
+
+    piechart(totalPositions.positions, ctxDPC);
+    piechart(retirements.retirements, ctxRetirements, true);
+    barChart(pointsPerSeason.pointsPerSeason, ctxPPS);
+
 }
 
 async function updateSelectedDriver(e) {
     const driver_id = e.target.value;
     if (driver_id !== "") {
-        await loadDriverData(driver_id);
-        document.querySelector(".driver-stats-simple").classList.remove("hidden");
+        const driverObject = await getCachedDrivers().then(d => d.filter(d => d.driver_id === driver_id)[0]);
+        const verifiedDriverId = driverObject.driver_id;
+        document.querySelectorAll(".selected-driver-name").forEach(element => element.innerHTML = driverObject.givenName.concat(" ", driverObject.familyName));
+        await loadSimpleDriverData(verifiedDriverId);
+        await loadDriverDetailedStats(verifiedDriverId).then(() => {
+            document.querySelector(".driver-stats-simple").classList.remove("hidden");
+            document.querySelector(".driver-stats-charts").classList.remove("hidden");
+        });
     } else {
         document.querySelector(".driver-stats-simple").classList.add("hidden");
+        document.querySelector(".driver-stats-charts").classList.add("hidden");
+
     }
 }
 
-
+Chart.register(ChartDataLabels);
 init();
