@@ -16,6 +16,7 @@
 <header>
     <img class="f1-logo" src="images/F1-Logo.png" alt="f1-logo">
     <h1>Formula 1 Stats</h1>
+    <p class="switch">Add Result</p>
 </header>
 <main>
     <div class="box driver-select">
@@ -56,7 +57,85 @@
             <canvas id="driver-retirement-chart"></canvas>
         </div>
     </section>
+    <form class="box new-result-form hidden">
+
+        <h2 class="title">Add New Race Result</h2>
+
+        <label>
+            Season
+            <input class="new-season input-text" type="text" required>
+        </label>
+
+        <label>
+            Round
+            <input class="new-season input-text" type="text" required>
+        </label>
+
+        <label>
+            Race Name
+            <input type="text" class="circuits input-text">
+        </label>
+
+        <label>
+            Circuit
+            <select class="circuits input-select">
+                <option>- Select Circuit -</option>
+            </select>
+        </label>
+
+        <label>
+            Date
+            <input class="new-date input-text" type="date" required>
+        </label>
+
+        <label>
+            Search Drivers
+            <input class="result-driver-name input-text" type="text">
+        </label>
+
+        <label>
+            Select Driver
+            <select class="drivers-result input-select">
+                <option>- Select Your Driver -</option>
+            </select>
+        </label>
+
+        <label>
+            Select Contructor
+            <select class="constructors-result input-select">
+                <option>- Select Your Constructor -</option>
+            </select>
+        </label>
+
+        <label>
+            Qualifying Position
+            <input class="new-quali-pos input-text" type="number" value="24" min="1" required>
+        </label>
+
+        <label>
+            Finish Position
+            <input class="new-finish-pos input-text" type="number" value="24" min="1" required>
+        </label>
+
+        <label>
+            Points
+            <input class="new-points input-text" type="number" value="0" min="0" required>
+        </label>
+
+        <label>
+            Retired?
+            <select class="new-retired input-select" required>
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+            </select>
+            <input type="text" class="input-text new-retirement-reason" placeholder="Retirement Reason (if retired)">
+        </label>
+
+        <input type="submit" value="Add Result">
+    </form>
 </main>
+
+
 
 </body>
 </html>

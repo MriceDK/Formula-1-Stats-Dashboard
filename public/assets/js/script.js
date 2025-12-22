@@ -6,6 +6,8 @@ const CACHE = {
 };
 
 
+
+
 async function init() {
     await getAllDriverNames();
     document.querySelector(".search-driver-form").addEventListener("submit", e => {
@@ -14,6 +16,7 @@ async function init() {
         updateSelectedDriver(e);
     });
     document.querySelector(".drivers").addEventListener("change", updateSelectedDriver);
+    document.querySelector(".switch").addEventListener("click", e => switchToAddNewResultForm(e));
 }
 
 async function getCachedDrivers() {
@@ -88,6 +91,16 @@ async function updateSelectedDriver(e) {
         document.querySelector(".driver-stats-charts").classList.add("hidden");
         document.querySelector(".driver-stats-simple").classList.add("hidden");
     }
+}
+
+function switchToAddNewResultForm(e) {
+    document.querySelector(".driver-select").classList.toggle("hidden");
+    document.querySelector(".driver-name").value = "";
+    document.querySelector(".drivers").innerHTML = `<option value="">- Select Your Driver -</option>`;
+    updateSelectedDriver(e);
+
+    document.querySelector(".new-result-form").classList.toggle("hidden");
+    document.querySelector(".switch").innerHTML = document.querySelector(".driver-select").classList.contains("hidden") ? "Search Drivers" : "Add New Result";
 }
 
 Chart.register(ChartDataLabels);
