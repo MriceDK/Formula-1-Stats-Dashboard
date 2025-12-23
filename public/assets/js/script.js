@@ -103,7 +103,7 @@ function switchToAddNewResultForm(e) {
     updateSelectedDriver(e);
 
     document.querySelector(".add-driver").classList.toggle("hidden");
-    document.querySelector(".switch").innerHTML = document.querySelector(".driver-select").classList.contains("hidden") ? "Search Drivers" : "Add New Result";
+    document.querySelector(".switch").innerHTML = document.querySelector(".driver-select").classList.contains("hidden") ? "Search Drivers" : "Add Driver";
 }
 
 async function addNewDriverResult(e) {
