@@ -1,7 +1,7 @@
 import {barChart, piechart} from "./charts.js";
 import {BASEURL} from "./config.js";
+import {getCountryCoordinates} from "./countries.js";
 
-const BASEURL = 'http://localhost:3000';
 const CACHE = {
     drivers : null,
 };
@@ -11,6 +11,7 @@ const CACHE = {
 
 async function init() {
     await getAllDriverNames();
+    centraMap();
     document.querySelector(".search-driver-form").addEventListener("submit", e => {
         e.preventDefault();
         getAllDriverNames().then(() => document.querySelector(".driver-stats-simple").classList.add("hidden"));
@@ -18,10 +19,11 @@ async function init() {
     });
     document.querySelector(".drivers").addEventListener("change", updateSelectedDriver);
     document.querySelector(".switch").addEventListener("click", e => switchToAddNewResultForm(e));
+    document.querySelector(".new-driver-form").addEventListener("submit", e => addNewDriverResult(e));
 }
 
-async function getCachedDrivers() {
-    if (CACHE.drivers === null) {
+async function getCachedDrivers(clearCache = false) {
+    if (CACHE.drivers === null || clearCache) {
         CACHE.drivers = await fetch(`${BASEURL}/drivers`).then(res => res.json());
         console.info("Drivers Cached");
     }
@@ -100,8 +102,72 @@ function switchToAddNewResultForm(e) {
     document.querySelector(".drivers").innerHTML = `<option value="">- Select Your Driver -</option>`;
     updateSelectedDriver(e);
 
-    document.querySelector(".new-result-form").classList.toggle("hidden");
+    document.querySelector(".add-driver").classList.toggle("hidden");
     document.querySelector(".switch").innerHTML = document.querySelector(".driver-select").classList.contains("hidden") ? "Search Drivers" : "Add New Result";
+}
+
+async function addNewDriverResult(e) {
+    e.preventDefault();
+    const data = {
+        driver_id: document.querySelector(".new-first-name").value.toLowerCase().trim(),
+        givenName: document.querySelector(".new-first-name").value.trim(),
+        familyName: document.querySelector(".new-family-name").value.trim(),
+        nationality: document.querySelector(".new-nationality").value.trim(),
+        dob: new Date(document.querySelector(".new-dob").value.trim()).toISOString().split('T')[0]
+    };
+
+    await fetch(`${BASEURL}/drivers/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+        .then(() => getCachedDrivers(true));
+}
+
+function centraMap() {
+    const containerId = 'centra-map';
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    // If a map was previously created, remove it first
+    if (window._centraMap) {
+        window._centraMap.remove();
+        window._centraMap = null;
+    }
+
+    const drivers = CACHE.drivers || [];
+    const coordinates = getCoordinates(drivers).filter(c => Array.isArray(c) && c.length === 2 && Number.isFinite(c[0]) && Number.isFinite(c[1]));
+
+    // create map
+    const map = L.map(containerId);
+    window._centraMap = map;
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    if (coordinates.length === 0) {
+        // no valid coordinates — keep a sensible default view
+        map.setView([0, 0], 100);
+        return;
+    }
+
+    const markers = coordinates.map(coord => L.marker(coord));
+    const markersGroup = L.featureGroup(markers).addTo(map);
+
+    // fit to markers with some padding
+    const bounds = markersGroup.getBounds();
+    map.fitBounds(bounds, { padding: [50, 50] });
+}
+
+function getCoordinates(drivers) {
+    const coordinates = [];
+    for (let i = 0; i < drivers.length ; i++) {
+        coordinates[i] = getCountryCoordinates(drivers[i].nationality);
+    }
+    return coordinates;
 }
 
 Chart.register(ChartDataLabels);
