@@ -107,7 +107,7 @@ main {
     padding: 2rem;
 }
 
-.search-driver-form, .new-result-form {
+.search-driver-form, .new-driver-form {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -121,7 +121,7 @@ main {
 }
 
 
-.search-driver-form label, .new-result-form label {
+.search-driver-form label, .new-driver-form label {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -406,8 +406,26 @@ input[type="submit"]:hover {
     text-align: center;
 }
 
+
+
+
+
+.add-driver {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 2rem;
+    width: 100%;
+    align-items: center;
+    justify-items: center;
+}
+
 .hidden {
     display: none;
 }
 
+.add-driver #centra-map {
+    height: 75%;
+    aspect-ratio: 3 / 3;
+}
 
