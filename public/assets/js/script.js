@@ -1,4 +1,5 @@
 import {barChart, piechart} from "./charts.js";
+import {BASEURL} from "./config.js";
 
 const BASEURL = 'http://localhost:3000';
 const CACHE = {
