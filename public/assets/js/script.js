@@ -124,6 +124,13 @@ async function addNewDriverResult(e) {
         body: JSON.stringify(data)
     })
         .then(() => getCachedDrivers(true));
+
+    document.querySelector(".new-first-name").value = "";
+    document.querySelector(".new-family-name").value = "";
+    document.querySelector(".new-nationality").value = "";
+    document.querySelector(".new-dob").value = "";
+
+    alert("New driver added successfully!");
 }
 
 function centraMap() {
