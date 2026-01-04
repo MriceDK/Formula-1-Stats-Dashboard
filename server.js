@@ -2,9 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import { Circuit, Constructor, Driver, Race, Result } from './logic/database/database-repository.js';
 import { CustomError } from './logic/exceptions/errorhandling.js';
+import { WebSocketServer } from 'ws';
 
 const PORT = 3000;
-const ADMIN_USERS = {max: 'vers-tappen'};
+const wss = new WebSocketServer({ port: 8080 });
 
 const SERVER_ERROR_CODE = 500;
 const SUCCESSFULL_CREATE_CODE = 201;
@@ -104,7 +105,14 @@ app.get('/drivers/:id', (req, res, next) => {
 
 app.post('/drivers', (req, res, next) => {
     Driver.create(req.body)
-        .then(() => res.status(SUCCESSFULL_CREATE_CODE).send())
+        .then(() => {
+            const payload = JSON.stringify({ type: 'driver-added', driver: req.body });
+            wss.clients.forEach(client => {
+                // readyState 1 === OPEN
+                if (client.readyState === 1) client.send(payload);
+            });
+            res.status(SUCCESSFULL_CREATE_CODE).send()
+        })
         .catch(err => next(err));
 });
 

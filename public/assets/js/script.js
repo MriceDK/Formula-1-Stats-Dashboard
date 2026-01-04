@@ -1,33 +1,76 @@
 import {barChart, piechart} from "./charts.js";
 import {BASEURL} from "./config.js";
-import {getCountryCoordinates} from "./countries.js";
+import {getNationalitiesList, getNationalityCoordinates} from "./nationalities.js";
 
 const CACHE = {
     drivers : null,
 };
 
-
-
-
 async function init() {
-    await getAllDriverNames();
-    centraMap();
-    document.querySelector(".search-driver-form").addEventListener("submit", e => {
-        e.preventDefault();
-        getAllDriverNames().then(() => document.querySelector(".driver-stats-simple").classList.add("hidden"));
-        updateSelectedDriver(e);
+    try {
+        const webSocket = new WebSocket("ws://localhost:8080");
+        webSocket.addEventListener("message", processIncoming);
+        await getAllDriverNames();
+        initializeMap();
+        document.querySelector(".search-driver-form").addEventListener("submit", e => {
+            e.preventDefault();
+            getAllDriverNames().then(() => document.querySelector(".driver-stats-simple").classList.add("hidden"));
+            updateSelectedDriver(e);
+        });
+        document.querySelector(".drivers").addEventListener("change", updateSelectedDriver);
+        document.querySelector(".switch").addEventListener("click", e => switchToAddNewResultForm(e));
+        document.querySelector(".new-driver-form").addEventListener("submit", e => addNewDriverResult(e));
+        loadAllNationalities();
+    } catch (err) {
+        showError("Failed to initialize application. Please refresh the page.", "error");
+        console.error("Init error:", err);
+    }
+
+}
+
+function showError(message, type = "error") {
+    const existingError = document.querySelector(".error-message");
+    if (existingError) {
+        existingError.remove();
+    }
+
+    const errorDiv = document.createElement("div");
+    errorDiv.className = `error-message ${type}`;
+    errorDiv.innerHTML = `
+        <span class="error-text">${message}</span>
+        <button class="error-close">&times;</button>
+    `;
+
+    const main = document.querySelector("main");
+    main.insertBefore(errorDiv, main.firstChild);
+
+    errorDiv.querySelector(".error-close").addEventListener("click", () => {
+        errorDiv.remove();
     });
-    document.querySelector(".drivers").addEventListener("change", updateSelectedDriver);
-    document.querySelector(".switch").addEventListener("click", e => switchToAddNewResultForm(e));
-    document.querySelector(".new-driver-form").addEventListener("submit", e => addNewDriverResult(e));
+
+    setTimeout(() => {
+        if (errorDiv.parentElement) {
+            errorDiv.remove();
+        }
+    }, 5000);
 }
 
 async function getCachedDrivers(clearCache = false) {
-    if (CACHE.drivers === null || clearCache) {
-        CACHE.drivers = await fetch(`${BASEURL}/drivers`).then(res => res.json());
-        console.info("Drivers Cached");
+    try {
+        if (CACHE.drivers === null || clearCache) {
+            const response = await fetch(`${BASEURL}/drivers`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            CACHE.drivers = await response.json();
+            console.info("Drivers Cached");
+        }
+        return CACHE.drivers;
+    } catch (err) {
+        showError("Failed to load drivers data. Please try again.", "error");
+        console.error("Error fetching drivers:", err);
+        return [];
     }
-    return CACHE.drivers;
 }
 
 async function getAllDriverNames() {
@@ -49,33 +92,41 @@ function driverOptionElement(driver_id, driver_name) {
 }
 
 async function loadSimpleDriverData(driver_id) {
+    try {
+        const winsObject = await fetch(`${BASEURL}/drivers/${driver_id}/wins`).then(res => res.json());
+        const overtakingObject = await fetch(`${BASEURL}/drivers/${driver_id}/overtaking`).then(res => res.json());
+        const teammateVSObject = await fetch(`${BASEURL}/drivers/${driver_id}/teammates`).then(res => res.json());
 
-    const winsObject = await fetch(`${BASEURL}/drivers/${driver_id}/wins`).then(res => res.json());
-    const overtakingObject = await fetch(`${BASEURL}/drivers/${driver_id}/overtaking`).then(res => res.json());
-    const teammateVSObject = await fetch(`${BASEURL}/drivers/${driver_id}/teammates`).then(res => res.json());
+        document.querySelector(".total-races").innerHTML = `${winsObject.total_races === null ? "N/A" : winsObject.total_races} races`;
+        document.querySelector(".win-percentage").innerHTML = `${winsObject.win_percentage === null ? "N/A" : winsObject.win_percentage}%`;
 
-    document.querySelector(".total-races").innerHTML = `${winsObject.total_races === null ? "N/A" : winsObject.total_races} races`;
-    document.querySelector(".win-percentage").innerHTML = `${winsObject.win_percentage === null ? "N/A" : winsObject.win_percentage}%`;
+        document.querySelector(".avg-quali-pos").innerHTML = overtakingObject.avg_start_pos === null ? "N/A" : overtakingObject.avg_start_pos;
+        document.querySelector(".avg-finish-pos").innerHTML = overtakingObject.avg_finish_pos === null ? "N/A" : overtakingObject.avg_finish_pos;
 
-    document.querySelector(".avg-quali-pos").innerHTML = overtakingObject.avg_start_pos === null ? "N/A" : overtakingObject.avg_start_pos;
-    document.querySelector(".avg-finish-pos").innerHTML = overtakingObject.avg_finish_pos === null ? "N/A" : overtakingObject.avg_finish_pos;
-
-    document.querySelector(".vs-teammates").innerHTML = `${teammateVSObject.teammate_dominance_score === null ? "N/A" : teammateVSObject.teammate_dominance_score}%`;
+        document.querySelector(".vs-teammates").innerHTML = `${teammateVSObject.teammate_dominance_score === null ? "N/A" : teammateVSObject.teammate_dominance_score}%`;
+    } catch (err) {
+        showError("Failed to load driver simple data. Please try again.", "error");
+        console.error("Error loading simple driver data:", err);
+    }
 }
 
 async function loadDriverDetailedStats(driver_id) {
-    const totalPositions = await fetch(`${BASEURL}/drivers/${driver_id}/positions`).then(res => res.json());
-    const pointsPerSeason = await fetch(`${BASEURL}/drivers/${driver_id}/points`).then(res => res.json());
-    const retirements = await fetch(`${BASEURL}/drivers/${driver_id}/retirements`).then(res => res.json());
+    try {
+        const totalPositions = await fetch(`${BASEURL}/drivers/${driver_id}/positions`).then(res => res.json());
+        const pointsPerSeason = await fetch(`${BASEURL}/drivers/${driver_id}/points`).then(res => res.json());
+        const retirements = await fetch(`${BASEURL}/drivers/${driver_id}/retirements`).then(res => res.json());
 
-    const ctxDPC = document.querySelector('#driver-positions-chart').getContext('2d');
-    const ctxPPS = document.querySelector('#points-per-season-chart').getContext('2d');
-    const ctxRetirements = document.querySelector('#driver-retirement-chart').getContext('2d');
+        const ctxDPC = document.querySelector('#driver-positions-chart').getContext('2d');
+        const ctxPPS = document.querySelector('#points-per-season-chart').getContext('2d');
+        const ctxRetirements = document.querySelector('#driver-retirement-chart').getContext('2d');
 
-    piechart(totalPositions.positions, ctxDPC);
-    piechart(retirements.retirements, ctxRetirements, true);
-    barChart(pointsPerSeason.pointsPerSeason, ctxPPS);
-
+        piechart(totalPositions.positions, ctxDPC);
+        piechart(retirements.retirements, ctxRetirements, true);
+        barChart(pointsPerSeason.pointsPerSeason, ctxPPS);
+    } catch (err) {
+        showError("Failed to load driver detailed stats. Please try again.", "error");
+        console.error("Error loading detailed driver stats:", err);
+    }
 }
 
 async function updateSelectedDriver(e) {
@@ -100,40 +151,64 @@ function switchToAddNewResultForm(e) {
     document.querySelector(".driver-select").classList.toggle("hidden");
     document.querySelector(".driver-name").value = "";
     document.querySelector(".drivers").innerHTML = `<option value="">- Select Your Driver -</option>`;
-    updateSelectedDriver(e);
-
+    updateSelectedDriver(e).catch(err => {
+        console.error(err)});
     document.querySelector(".add-driver").classList.toggle("hidden");
     document.querySelector(".switch").innerHTML = document.querySelector(".driver-select").classList.contains("hidden") ? "Search Drivers" : "Add Driver";
+    if (!document.querySelector(".add-driver").classList.contains("hidden")) {
+        initializeMap();
+    }
 }
 
 async function addNewDriverResult(e) {
     e.preventDefault();
+
+    const firstName = document.querySelector(".new-first-name").value.trim();
+    const familyName = document.querySelector(".new-family-name").value.trim();
+    const nationality = document.querySelector(".new-nationality").value.trim();
+    const dob = document.querySelector(".new-dob").value.trim();
+
+    if (!firstName || !familyName || !nationality || !dob) {
+        showError("Please fill in all required fields.", "warning");
+        return;
+    }
+
     const data = {
-        driver_id: document.querySelector(".new-first-name").value.toLowerCase().trim(),
-        givenName: document.querySelector(".new-first-name").value.trim(),
-        familyName: document.querySelector(".new-family-name").value.trim(),
-        nationality: document.querySelector(".new-nationality").value.trim(),
-        dob: new Date(document.querySelector(".new-dob").value.trim()).toISOString().split('T')[0]
+        driver_id: firstName.toLowerCase().concat("_", familyName.toLowerCase()),
+        givenName: firstName,
+        familyName: familyName,
+        nationality: nationality,
+        dob: new Date(dob).toISOString().split('T')[0]
     };
 
-    await fetch(`${BASEURL}/drivers/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-        .then(() => getCachedDrivers(true));
+    try {
+        const response = await fetch(`${BASEURL}/drivers/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        await getCachedDrivers(true);
+        updateMapWithDrivers();
 
-    document.querySelector(".new-first-name").value = "";
-    document.querySelector(".new-family-name").value = "";
-    document.querySelector(".new-nationality").value = "";
-    document.querySelector(".new-dob").value = "";
+        document.querySelector(".new-first-name").value = "";
+        document.querySelector(".new-family-name").value = "";
+        document.querySelector(".new-nationality").value = "";
+        document.querySelector(".new-dob").value = "";
+        const { firstName, familyName } = data;
+        showError(`Driver ${firstName} ${familyName} added successfully!`, "success");
+    } catch (err) {
+        showError("Failed to add driver. Please try again.", "error");
+        console.error("Error adding driver:", err);
+    }
 
-    alert("New driver added successfully!");
 }
 
-function centraMap() {
+function initializeMap() {
     const containerId = 'centra-map';
     const el = document.getElementById(containerId);
     if (!el) return;
@@ -143,38 +218,85 @@ function centraMap() {
         window._centraMap.remove();
         window._centraMap = null;
     }
-
-    const drivers = CACHE.drivers || [];
-    const coordinates = getCoordinates(drivers).filter(c => Array.isArray(c) && c.length === 2 && Number.isFinite(c[0]) && Number.isFinite(c[1]));
-
     // create map
-    const map = L.map(containerId);
+    const map = L.map(containerId).setView([20, 0], 2);
     window._centraMap = map;
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
+    window._centraMarkers = L.featureGroup().addTo(map);
+}
+
+function updateMapWithDrivers() {
+    if (!window._centraMap || !window._centraMarkers) {
+        initializeMap();
+    }
+
+    if (!window._sessionAddedDrivers) {
+        window._sessionAddedDrivers = [];
+    }
+
+    const coordinates = getCoordinates(window._sessionAddedDrivers).filter(c => Array.isArray(c) && c.length === 2 && Number.isFinite(c[0]) && Number.isFinite(c[1]));
+
+    // Clear existing markers
+    window._centraMarkers.clearLayers();
+
     if (coordinates.length === 0) {
-        // no valid coordinates — keep a sensible default view
-        map.setView([0, 0], 100);
         return;
     }
 
-    const markers = coordinates.map(coord => L.marker(coord));
-    const markersGroup = L.featureGroup(markers).addTo(map);
+    // Add new markers
+    coordinates.forEach(coord => {
+        L.marker(coord).addTo(window._centraMarkers);
+    });
 
-    // fit to markers with some padding
-    const bounds = markersGroup.getBounds();
-    map.fitBounds(bounds, { padding: [50, 50] });
+    // Fit bounds to show all markers
+    const bounds = window._centraMarkers.getBounds();
+    if (bounds.isValid()) {
+        window._centraMap.fitBounds(bounds, { padding: [50, 50] });
+    }
 }
 
 function getCoordinates(drivers) {
     const coordinates = [];
     for (let i = 0; i < drivers.length ; i++) {
-        coordinates[i] = getCountryCoordinates(drivers[i].nationality);
+        coordinates[i] = getNationalityCoordinates(drivers[i].nationality);
     }
     return coordinates;
+}
+
+async function processIncoming(e) {
+    try {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'driver-added' && msg.driver) {
+            if (!CACHE.drivers) CACHE.drivers = [];
+            const exists = CACHE.drivers.some(d => d.driver_id === msg.driver.driver_id);
+            if (!exists) {
+                CACHE.drivers.push(msg.driver);
+                await getAllDriverNames();
+
+                if (!window._sessionAddedDrivers) {
+                    window._sessionAddedDrivers = [];
+                }
+                window._sessionAddedDrivers.push(msg.driver);
+
+                updateMapWithDrivers();
+                showError(`New driver ${msg.driver.givenName} ${msg.driver.familyName} added by another user!`, "success");
+            }
+        }
+    } catch (err) {
+        console.error('WS message handling error', err);
+    }
+}
+
+function loadAllNationalities() {
+    const nationalities = getNationalitiesList();
+    const nationalitySelect = document.querySelector(".new-nationality");
+    nationalities.forEach(nationality => {
+        nationalitySelect.insertAdjacentHTML(`beforeend`, `<option value="${nationality}">${nationality}</option>`);
+    });
 }
 
 Chart.register(ChartDataLabels);
