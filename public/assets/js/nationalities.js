@@ -196,10 +196,10 @@ const nationalityCoords = {
 };
 
 
-export function getCountryCoordinates(countryName) {
+export function getNationalityCoordinates(countryName) {
     return [nationalityCoords[countryName].lat, nationalityCoords[countryName].long] || null;
 }
 
-export function getCountriesList() {
+export function getNationalitiesList() {
     return Object.keys(nationalityCoords);
 }
