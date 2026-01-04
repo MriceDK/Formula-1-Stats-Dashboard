@@ -1,3 +1,5 @@
+import {Chart} from "chart.js";
+
 const chartsCache =
     {
         positionsChart : null,
@@ -6,23 +8,22 @@ const chartsCache =
     };
 
 const F1Colors = [
-    "#ED1131",  // Ferrari Red [web:2]
-    "#00D7B6",  // Mercedes Teal [web:2]
-    "#4781D7",  // Red Bull Blue [web:2]
-    "#1868DB",  // Williams Blue [web:2]
-    "#00A1E8",  // Alpine Blue [web:2]
-    "#FF8700",  // McLaren Orange [web:10]
-    "#ea7000",  // F1 Orange
-    "#20936b",  // Racing Green
-    "#95989b",  // Neutral Gray
-    "#e10600"   // F1 Official Red [web:3]
+    "#ED1131",
+    "#00D7B6",
+    "#4781D7",
+    "#1868DB",
+    "#00A1E8",
+    "#FF8700",
+    "#ea7000",
+    "#20936b",
+    "#95989b",
+    "#e10600"
 ];
 
 function piechart(data, ctx, retirement = false) {
 
     const canvasId = ctx.canvas.id;
 
-    // Destroy existing charts
     if (chartsCache.positionsChart && canvasId === 'driver-positions-chart') {
         chartsCache.positionsChart.destroy();
     }
@@ -119,7 +120,7 @@ function barChart(data, ctx) {
             datasets: [{
                 label: "Points",
                 data: Object.values(data),
-                backgroundColor: F1Colors[0], // F1 Red gradient base
+                backgroundColor: F1Colors[0],
                 borderColor: 'rgba(255, 255, 255, 0.2)',
                 borderWidth: 2,
                 borderRadius: 12,

@@ -259,7 +259,6 @@ app.use((err, req, res) => {
     if (err instanceof CustomError)
         res.status(err.statusCode).send(err.message);
     else {
-        console.error(err);
         res.status(SERVER_ERROR_CODE).send("Server error");
     }
 });

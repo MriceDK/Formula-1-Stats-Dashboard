@@ -91,12 +91,10 @@ async function remove(raceId, driverId) {
 
 function mapResultRow(row) {
     const {
-        // foreign keys from results we want to omit on top level
         race_id,
         driver_id,
         constructor_id,
 
-        // race
         r_race_id,
         r_race_name,
         r_season,
@@ -105,19 +103,16 @@ function mapResultRow(row) {
         r_time,
         r_circuit_id,
 
-        // driver
         d_driver_id,
         d_givenName,
         d_familyName,
         d_dob,
         d_nationality,
 
-        // constructor
         c_constructor_id,
         c_name,
         c_nationality,
 
-        // circuit
         ci_circuit_id,
         ci_name,
         ci_lat,
@@ -126,13 +121,10 @@ function mapResultRow(row) {
         ci_country,
         ci_wikipedia_url,
 
-        // everything else that belongs to the result row itself
-        // (grid, position, position_order, points, laps, status)
         ...resultFields
     } = row;
 
     return {
-        // Top-level = only the “pure result” fields
         grid: resultFields.grid,
         position: resultFields.position,
         position_order: resultFields.position_order,

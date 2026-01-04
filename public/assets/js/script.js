@@ -2,6 +2,7 @@ import {barChart, piechart} from "./charts.js";
 import {BASEURL} from "./config.js";
 import {getNationalitiesList} from "./nationalities.js";
 import {initializeMap, updateMapWithDrivers} from "./map.js";
+import {Chart} from "chart.js";
 
 const CACHE = {
     drivers : null,
@@ -24,7 +25,6 @@ async function init() {
         loadAllNationalities();
     } catch (err) {
         showError("Failed to initialize application. Please refresh the page.", "error");
-        console.error("Init error:", err);
     }
 
 }
@@ -64,12 +64,10 @@ async function getCachedDrivers(clearCache = false) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             CACHE.drivers = await response.json();
-            console.info("Drivers Cached");
         }
         return CACHE.drivers;
     } catch (err) {
         showError("Failed to load drivers data. Please try again.", "error");
-        console.error("Error fetching drivers:", err);
         return [];
     }
 }
@@ -107,7 +105,6 @@ async function loadSimpleDriverData(driver_id) {
         document.querySelector(".vs-teammates").innerHTML = `${teammateVSObject.teammate_dominance_score === null ? "N/A" : teammateVSObject.teammate_dominance_score}%`;
     } catch (err) {
         showError("Failed to load driver simple data. Please try again.", "error");
-        console.error("Error loading simple driver data:", err);
     }
 }
 
@@ -126,7 +123,6 @@ async function loadDriverDetailedStats(driver_id) {
         barChart(pointsPerSeason.pointsPerSeason, ctxPPS);
     } catch (err) {
         showError("Failed to load driver detailed stats. Please try again.", "error");
-        console.error("Error loading detailed driver stats:", err);
     }
 }
 
@@ -152,8 +148,7 @@ function switchToAddNewResultForm(e) {
     document.querySelector(".driver-select").classList.toggle("hidden");
     document.querySelector(".driver-name").value = "";
     document.querySelector(".drivers").innerHTML = `<option value="">- Select Your Driver -</option>`;
-    updateSelectedDriver(e).catch(err => {
-        console.error(err)});
+    updateSelectedDriver(e).catch(() => {});
     document.querySelector(".add-driver").classList.toggle("hidden");
     document.querySelector(".switch").innerHTML = document.querySelector(".driver-select").classList.contains("hidden") ? "Search Drivers" : "Add Driver";
     if (!document.querySelector(".add-driver").classList.contains("hidden")) {
@@ -204,7 +199,6 @@ async function addNewDriverResult(e) {
         showError(`Driver ${givenName} ${familyName} added successfully!`, "success");
     } catch (err) {
         showError("Failed to add driver. Please try again.", "error");
-        console.error("Error adding driver:", err);
     }
 
 }
@@ -229,7 +223,6 @@ async function processIncoming(e) {
             }
         }
     } catch (err) {
-        console.error('WS message handling error', err);
     }
 }
 

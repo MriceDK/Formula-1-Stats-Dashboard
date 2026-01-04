@@ -5,12 +5,11 @@ function initializeMap() {
     const el = document.getElementById(containerId);
     if (!el) return;
 
-    // If a map was previously created, remove it first
     if (window._centraMap) {
         window._centraMap.remove();
         window._centraMap = null;
     }
-    // create map
+
     const map = L.map(containerId, {
         preferCanvas: true,
         zoomSnap: 0.5,
@@ -44,7 +43,6 @@ function updateMapWithDrivers() {
 
     const coordinates = getCoordinates(window._sessionAddedDrivers).filter(c => Array.isArray(c) && c.length === 2 && Number.isFinite(c[0]) && Number.isFinite(c[1]));
 
-    // Clear existing markers
     window._centraMarkers.clearLayers();
 
     if (coordinates.length === 0) {
@@ -64,12 +62,10 @@ function updateMapWithDrivers() {
         popupAnchor: [0, -45]
     });
 
-    // Add new markers
     coordinates.forEach(coord => {
         L.marker(coord, {icon : redIcon}).addTo(window._centraMarkers);
     });
 
-    // Fit bounds to show all markers
     const bounds = window._centraMarkers.getBounds();
     if (bounds.isValid()) {
         window._centraMap.fitBounds(bounds, { padding: [50, 50] });
