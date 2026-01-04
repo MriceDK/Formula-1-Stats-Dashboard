@@ -66,22 +66,24 @@
             <h2 class="title">Add New Driver</h2>
 
             <label>
-                First Name
+                First Name*
                 <input class="new-first-name input-text" type="text" required>
             </label>
 
             <label>
-                Family Name
+                Family Name*
                 <input class="new-family-name input-text" type="text" required>
             </label>
 
             <label>
-                nationality
-                <input type="text" class="new-nationality input-text">
+                nationality*
+                <select class="input-select new-nationality" required>
+                    <option  value="" disabled selected>Select Nationality</option>
+                </select>
             </label>
 
             <label>
-                Date of Birth
+                Date of Birth*
                 <input class="new-dob input-text" type="date" required>
             </label>
             <input type="submit" value="Add Result">
