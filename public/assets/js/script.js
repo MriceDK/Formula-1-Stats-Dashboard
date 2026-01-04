@@ -200,8 +200,8 @@ async function addNewDriverResult(e) {
         document.querySelector(".new-family-name").value = "";
         document.querySelector(".new-nationality").value = "";
         document.querySelector(".new-dob").value = "";
-        const { firstName, familyName } = data;
-        showError(`Driver ${firstName} ${familyName} added successfully!`, "success");
+        const { givenName, familyName } = data;
+        showError(`Driver ${givenName} ${familyName} added successfully!`, "success");
     } catch (err) {
         showError("Failed to add driver. Please try again.", "error");
         console.error("Error adding driver:", err);
