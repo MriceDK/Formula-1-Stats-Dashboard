@@ -19,7 +19,8 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-basic-auth": "^1.2.1",
-    "promise-mysql": "^5.2.0"
+    "promise-mysql": "^5.2.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@eslint/css": "^0.14.1",
